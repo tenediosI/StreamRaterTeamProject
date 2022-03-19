@@ -1,0 +1,23 @@
+{% extends 'stream/base.html' %}
+{% load static %}
+
+{% block title_block %}
+    Edit Profile
+{% endblock %}
+
+{% block body_block %}
+    <h1>{{ user.username }}</h1>
+    {% if user.userprofile.picture %}
+        <img src="{{ MEDIA_URL }}{{ user.userprofile.picture.name }}"
+             width="200" height="200"/><br/>
+    {% else %}
+        <img src="{% static 'images/NoProfile.jpg' %}"
+             width="200" height="200"/><br/>
+    {% endif %}
+    <a>Account created in: {{ user.date_joined }}</a><br/>
+    <a>Email: {{ user.email }}</a><br/>
+    <a>Bio: {{ user.userprofile.bio }}</a><br/>
+    {% if user == current_user %}
+        <a href="{% url 'stream:edit_profile' %}">Edit profile</a></li>
+    {% endif %}
+{% endblock %}

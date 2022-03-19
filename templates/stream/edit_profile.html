@@ -1,0 +1,29 @@
+{% extends 'stream/base.html' %}
+{% load static %}
+
+{% block title_block %}
+    Edit Profile
+{% endblock %}
+
+
+{% block body_block %}
+    <h1>{{ user.username }}</h1>
+    {% if user.userprofile.picture %}
+        <img src="{{ MEDIA_URL }}{{ user.userprofile.picture.name }}"
+             width="200" height="200"/><br/>
+    {% else %}
+        <img src="{% static 'images/NoProfile.jpg' %}"
+             width="200" height="200"/><br/>
+    {% endif %}
+    <a>Account created in: {{ user.date_joined }}</a><br/>
+    <a>Email: {{ user.email }}</a><br/>
+    <a>Bio: {{ user.userprofile.bio }}</a><br/>
+    <hr/>
+    <form id="edit_user_profile" method="post">
+        {% csrf_token %}
+        Email: <input id="email" type="text" name="email"><br/>
+        Bio: <textarea id="bio" type="text" name="bio"></textarea><br/>
+        <input type="button" id="update-profile" value="Update details">
+    </form>
+    <h3 id="output"></h3>
+{% endblock %}
