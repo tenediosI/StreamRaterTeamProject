@@ -7,22 +7,29 @@
 
 
 {% block body_block %}
-    <h1>{{ user.username }}</h1>
-    {% if user.userprofile.picture %}
-        <img id="show-picture" src="{{ MEDIA_URL }}{{ user.userprofile.picture.name }}"
-             width="200" height="200"/><br/>
-    {% else %}
-        <img id="show-picture" src="{% static 'images/NoProfile.jpg' %}"
-             width="200" height="200"/><br/>
-    {% endif %}
-    <a>Account created in: {{ user.date_joined }}</a><br/>
-    Email: <a id="show-email">{{ user.email }}</a><br/>
-    Bio: <a id="show-bio">{{ user.userprofile.bio }}</a><br/>
-    <hr/>
-    <form id="edit_user_profile" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        Email: <input id="email" type="text" name="email"><br/>
-        Bio: <textarea id="bio" type="text" name="bio"></textarea><br/>
-        <input type="button" id="update-profile" value="Update details">
-    </form>
+    <link rel="stylesheet" href="{% static 'style/profilePages.css' %}" type="text/css" />
+    <div class="profile-block">
+        <h1>{{ user.username }}</h1>
+        <div id="profile-image">
+            {% if user.userprofile.picture %}
+                <img src="{{ MEDIA_URL }}{{ user.userprofile.picture.name }}"
+                     width="200" height="200"/><br/>
+            {% else %}
+                <img src="{% static 'images/NoProfile.jpg' %}"
+                     width="200" height="200"/><br/>
+            {% endif %}
+        </div>
+        <div id="user-data">
+            <a class="info"><a class="info-tag">Account created in: </a>{{ user.date_joined }}</a><br/>
+            <a class="info"><a class="info-tag">Email: </a>{{ user.email }}</a><br/>
+            <a class="info"><a class="info-tag">Bio: </a>{{ user.userprofile.bio }}</a><br/>
+        </div>
+        <hr/>
+        <form id="edit-user-profile" method="post">
+            {% csrf_token %}
+            <a class="update"><a class="update-tag">Email </a><input id="email" type="text" name="email" placeholder="Got a new email?"></a><br/>
+            <a class="update"><a class="update-tag">Bio </a><textarea id="bio" type="text" name="bio" placeholder="What's new?"></textarea></a><br/>
+            <input type="button" id="button-link" value="Update">
+        </form>
+    </div>
 {% endblock %}

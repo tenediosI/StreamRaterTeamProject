@@ -6,11 +6,12 @@
 {% endblock %}
 
 {% block body_block %}
-     <div>
+    <link rel="stylesheet" href="{% static 'style/genericPage.css' %}" type="text/css" />
+    <div class="container">
          <a>Stream Rater ~ a website that rates the top 20 categories streamed on twitch
              and the top 20 streamers in each game.</a><br>
          <a>We use the twitch API to get the top categories and streamers.</a><br>
          <a>Users can interact with each other on the comment section. Keep the conversation going!!</a><br>
          <p>Developed by WAD2 Team 15B 2022</p>
-     </div>
+    </div>
 {% endblock %}

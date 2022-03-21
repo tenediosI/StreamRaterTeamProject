@@ -34,6 +34,7 @@ $(document).ready(function () {
                 data: {
                     email: $('#email').val(),
                     bio: $('#bio').val(),
+                    picture: $('#picture').val(),
                     csrfmiddlewaretoken: csrftoken,
                 },
                 success: updateDetails()
@@ -53,11 +54,11 @@ $(document).ready(function () {
     function updateDetails(){
         if ($('#email').val()){
             $('#show-email').text($('#email').val());
-        } if ($('#bio').val()){
+        } if ($('#email').val()){
             $('#show-bio').text($('#bio').val());
         }
-        $('#email').val('');
-        $('#bio').val('');
+        $('#email').text('');
+        $('#bio').text('');
         alert("Profile Updated")
     }
 

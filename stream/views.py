@@ -127,7 +127,6 @@ def register(request):
             profile = profile_form.save(commit=False)
             profile.user = user
             if 'picture' in request.FILES:
-                print(type(request.FILES['picture']))
                 profile.picture = request.FILES['picture']
             profile.save()
             registered = True

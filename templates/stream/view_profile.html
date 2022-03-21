@@ -6,18 +6,28 @@
 {% endblock %}
 
 {% block body_block %}
-    <h1>{{ user.username }}</h1>
-    {% if user.userprofile.picture %}
-        <img src="{{ MEDIA_URL }}{{ user.userprofile.picture.name }}"
-             width="200" height="200"/><br/>
-    {% else %}
-        <img src="{% static 'images/NoProfile.jpg' %}"
-             width="200" height="200"/><br/>
-    {% endif %}
-    <a>Account created in: {{ user.date_joined }}</a><br/>
-    <a>Email: {{ user.email }}</a><br/>
-    <a>Bio: {{ user.userprofile.bio }}</a><br/>
-    {% if user == current_user %}
-        <a href="{% url 'stream:edit_profile' %}">Edit profile</a></li>
-    {% endif %}
+    <link rel="stylesheet" href="{% static 'style/profilePages.css' %}" type="text/css" />
+    <div class="profile-block">
+        <h1>{{ user.username }}</h1>
+        <div id="profile-image">
+            {% if user.userprofile.picture %}
+                <img src="{{ MEDIA_URL }}{{ user.userprofile.picture.name }}"
+                     width="200" height="200"/><br/>
+            {% else %}
+                <img src="{% static 'images/NoProfile.jpg' %}"
+                     width="200" height="200"/><br/>
+            {% endif %}
+        </div>
+        <div id="user-data">
+            <a class="info"><a class="info-tag">Account created in: </a>{{ user.date_joined }}</a><br/>
+            <a class="info"><a class="info-tag">Email: </a>{{ user.email }}</a><br/>
+            <a class="info"><a class="info-tag">Bio: </a>{{ user.userprofile.bio }}</a><br/>
+        </div>
+            {% if user == current_user %}
+            <a id="button-link" href="{% url 'stream:edit_profile' %}">
+                Edit
+            </a>
+        {% endif %}
+
+    </div>
 {% endblock %}

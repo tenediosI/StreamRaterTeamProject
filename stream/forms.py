@@ -5,7 +5,12 @@ from django.contrib.auth.models import User
 from stream.models import UserProfile, Comment, SubComment
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Make it safe!!',
+                                                        'class': 'form-password'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'What will you be called?',
+                                                        'class': 'form-username'}))
+    email = forms.EmailField(widget=forms.TextInput(attrs={'placeholder': 'example@email.com',
+                                                        'class': 'form-email'}))
 
     class Meta:
         model = User
@@ -14,6 +19,13 @@ class UserForm(forms.ModelForm):
 
 
 class UserProfileForm(forms.ModelForm):
+    bio = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Tell us about you!',
+                                                       'class': 'form-bio',
+                                                       'rows': 3,
+                                                       'cols': 40,
+                                                       'style': 'height: 3em;'
+                                                       }))
+
     class Meta:
         model = UserProfile
         fields = ('picture','bio')
