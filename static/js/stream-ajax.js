@@ -15,9 +15,7 @@ function getCookie(name) {
 }
 
 let csrftoken = $("[name=csrfmiddlewaretoken]").val();
-function done () {
-            alert("Profile has been Updated. \nReload to see visible changes.");
-        }
+
 
 $(document).ready(function () {
 
@@ -38,7 +36,7 @@ $(document).ready(function () {
                     bio: $('#bio').val(),
                     csrfmiddlewaretoken: csrftoken,
                 },
-                success: done(),
+                success: updateDetails()
 
             });
         } else {
@@ -50,6 +48,17 @@ $(document).ready(function () {
     function validateEmail(email){
 
         return !!((email.includes("@") && email.includes(".")) || email.trim()=='');
+    }
+
+    function updateDetails(){
+        if ($('#email').val()){
+            $('#show-email').text($('#email').val());
+        } if ($('#bio').val()){
+            $('#show-bio').text($('#bio').val());
+        }
+        $('#email').val('');
+        $('#bio').val('');
+        alert("Profile Updated")
     }
 
 });
