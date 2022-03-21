@@ -11,6 +11,9 @@
     <div class="grid-container">
     {% if categories %}
         {% for c in categories %}
+		{{ counter.increment }}
+		<strong>{{ counter.count }}</strong>
+			<div class="grid-item">{{ counter.count }}
             <li>
             <img src="{{ c.image }}">
             {% if c == act_cat %}
@@ -25,5 +28,6 @@
     {% else %}
         <li><strong>There are no categories present.</strong></li>
     {% endif %}
+	</div>
     </div>
 {% endblock %}
