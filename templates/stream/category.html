@@ -11,12 +11,16 @@
 {% block body_block %}
     <div>{{ category.name }}</div>
     <img src={{ category.image }}>
+	<div class="grid-container">
     {% for s in streamers %}
         {% if category == s.category %}
+			<div id="grid-item{{ forloop.counter }}">
             <li>
                 <img src="{{ s.image }}">
                 <a href="{% url 'stream:show_streamer' name=s.name category_name_slug=category.slug %}">{{ s.name }}</a>
             </li>
+			</div>
         {% endif %}
     {% endfor %}
+	</div>
 {% endblock %}

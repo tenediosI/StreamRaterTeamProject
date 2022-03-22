@@ -239,10 +239,3 @@ def profile(request, username):
             print(form.errors)
 
     return render(request, 'stream/profile.html', {'userprofile': userprofile, 'selecteduser': user, 'form': form})
-
-class counter:
-    count = 0;
-    
-    def increment():
-        count += 1
-        return ''

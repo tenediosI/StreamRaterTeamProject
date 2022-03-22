@@ -71,7 +71,12 @@ body {
 
 .grid-container {  
   display: grid;
+  float: left;
+  grid-gap: 10px;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(8, 5vw);
-  grid-gap: 15px;
 } 
+
+.grid-container div {
+	float: left;
+	padding: 10px;
+}
