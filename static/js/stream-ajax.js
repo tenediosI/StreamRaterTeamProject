@@ -51,14 +51,13 @@ $(document).ready(function () {
     }
 
     function updateDetails(){
-        if ($('#email').val()){
+        if ($('#email').val() !== ''){
             $('#show-email').text($('#email').val());
-        } if ($('#bio').val()){
+        } if ($('#bio').val() !== ''){
             $('#show-bio').text($('#bio').val());
-            alert("hey shit happens");
         }
-        $('#email').text('');
-        $('#bio').text('');
+        $('#email').val('');
+        $('#bio').val('');
         alert("Profile Updated")
     }
 
