@@ -15,7 +15,7 @@
     {% for s in streamers %}
         {% if category == s.category %}
 			<div id="grid-item{{ forloop.counter }}">
-                <a href="{% url 'stream:show_streamer' name=s.name category_name_slug=category.slug %}"><img src="{{ s.image }}"></a>
+                <a href="{% url 'stream:show_streamer' name=s.name category_name_slug=category.slug %}"><img class="icon" src="{{ s.image }}"></a>
 			</div>
         {% endif %}
     {% endfor %}
