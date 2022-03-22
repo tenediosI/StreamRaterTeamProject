@@ -19,7 +19,7 @@ let csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 $(document).ready(function () {
 
-    $("#update-profile").click(function (e) {
+    $("#button-link").click(function (e) {
 
         e.preventDefault();
 
@@ -34,7 +34,6 @@ $(document).ready(function () {
                 data: {
                     email: $('#email').val(),
                     bio: $('#bio').val(),
-                    picture: $('#picture').val(),
                     csrfmiddlewaretoken: csrftoken,
                 },
                 success: updateDetails()
@@ -53,9 +52,9 @@ $(document).ready(function () {
 
     function updateDetails(){
         if ($('#email').val()){
-            $('#show-email').text($('#email').val());
-        } if ($('#email').val()){
-            $('#show-bio').text($('#bio').val());
+            $('#show-email').val($('#email').val());
+        } if ($('#bio').val()){
+            $('#show-bio').val($('#bio').val());
         }
         $('#email').text('');
         $('#bio').text('');

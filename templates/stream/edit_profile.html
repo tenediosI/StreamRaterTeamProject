@@ -21,8 +21,8 @@
         </div>
         <div id="user-data">
             <a class="info"><a class="info-tag">Account created in: </a>{{ user.date_joined }}</a><br/>
-            <a class="info"><a class="info-tag">Email: </a>{{ user.email }}</a><br/>
-            <a class="info"><a class="info-tag">Bio: </a>{{ user.userprofile.bio }}</a><br/>
+            <a class="info"><a class="info-tag">Email: </a><a id="show-email">{{ user.email }}</a></a><br/>
+            <a class="info"><a class="info-tag">Bio: </a><a id="show-bio">{{ user.userprofile.bio }}</a></a><br/>
         </div>
         <hr/>
         <form id="edit-user-profile" method="post">
