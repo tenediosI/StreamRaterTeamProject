@@ -5,12 +5,8 @@ $(document).ready(function () {
         msgstr = msgstr + "ooo";
         $("#msg").html(msgstr);
     });
-/**
-    $("p").hover(function () {
-            $(this).css('color', 'red');
-        },
-        function () {
-            $(this).css('color', 'blue');
-        });
- */
+
+    $("img").hover(function(){
+        $(this).css("box-shadow : 10px 10px 10px 5px gray,10px 10px 10px 5px blueviolet");
+    });
 });
