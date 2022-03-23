@@ -9,8 +9,11 @@ body{
 
 .container {
     position: absolute;
-    padding: 50px;
+    top: 25%;
+    left: 50%;
     width: 90%;
+    padding: 20px;
+    transform: translate(-50%, -50%);
     background: white;
     border-radius: 10px;
 }

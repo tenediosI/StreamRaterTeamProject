@@ -6,18 +6,21 @@
 {% endblock %}
 
 {% block body_block %}
-    <form id="sub_comment_form" method="POST"
-          action="{% url 'stream:add_sub_comment' id=id name=name category_name_slug=slug %}"
-          enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-        {% endfor %}
-        {% for field in form.visible_fields %}
-            {{ field.errors }}
-            {{ field.help_text }}
-            {{ field }}
-        {% endfor %}
-        <input type="submit" name="submit" value="post comment" />
-    </form>
+    <link rel="stylesheet" href="{% static 'style/commentPage.css' %}" type="text/css"/>
+    <div class="container" id="stylefix-subcomment">
+        <form id="sub_comment_form" method="POST"
+              action="{% url 'stream:add_sub_comment' id=id name=name category_name_slug=slug %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            {% for field in form.visible_fields %}
+                {{ field.errors }}
+                {{ field.help_text }}
+                {{ field }}
+            {% endfor %}<br/>
+            <input class="button" id="post-comment" type="submit" name="submit" value="post comment" />
+        </form>
+    </div>
 {% endblock %}

@@ -31,7 +31,11 @@ class UserProfileForm(forms.ModelForm):
         fields = ('picture','bio')
 
 class CommentForm(forms.ModelForm):
-    text = forms.TextInput()
+    text = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-bio',
+                                                       'rows': 20,
+                                                       'cols': 100,
+                                                       'style': 'height: 5em;'
+                                                       }))
     rating = forms.IntegerField(required=True,
                                 initial=0,
                                 help_text="Rating between 1-5")
@@ -49,7 +53,12 @@ class CommentForm(forms.ModelForm):
 
 
 class SubCommentForm(forms.ModelForm):
-    text = forms.TextInput()
+    text = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'What do you have to say?',
+                                                       'class': 'form-bio',
+                                                       'rows': 20,
+                                                       'cols': 100,
+                                                       'style': 'height: 5em;'
+                                                       }))
 
     class Meta:
         model = SubComment

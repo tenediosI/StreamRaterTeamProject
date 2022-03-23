@@ -6,7 +6,10 @@
 {% endblock %}
 
 {% block body_block %}
-    <p>Thanks for contributing!</p>
-    <a href="{% url 'stream:show_streamer' name=streamer.name category_name_slug=category.slug %}">Please click here to return</a>
+    <link rel="stylesheet" href="{% static 'style/commentPage.css' %}" type="text/css"/>
+    <div class="container">
+        <p>Thanks for contributing!</p>
+        <a href="{% url 'stream:show_streamer' name=streamer.name category_name_slug=category.slug %}">Please click here to return</a>
+    </div>
 {% endblock %}
 
