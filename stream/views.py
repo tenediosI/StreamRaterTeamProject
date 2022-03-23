@@ -142,7 +142,6 @@ def register(request):
                            'profile_form': profile_form,
                            'registered': registered})
 
-
 def user_login(request):
     error = None
     if request.method == 'POST':
@@ -191,7 +190,6 @@ def view_profile(request, username=''):
         logout(request)
         return HttpResponseRedirect(reverse('homepage'))
 
-
 @login_required
 def user_logout(request):
     logout(request)
@@ -211,31 +209,3 @@ def register_profile(request):
             print(form.errors)
     context_dict = {'form': form}
     return render(request, 'stream/profile_registration.html', context_dict)
-
-
-@login_required
-def profile(request, username):
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return redirect('homepage')
-
-    userprofile = UserProfile.objects.get_or_create(user=user)[0]
-    form = UserProfileForm({
-        # 'website': userprofile.website,
-        'picture': userprofile.picture
-    })
-
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
-
-        if form.is_valid():
-            form.save(commit=True)
-
-            return redirect('profile', user.username)
-
-        else:
-
-            print(form.errors)
-
-    return render(request, 'stream/profile.html', {'userprofile': userprofile, 'selecteduser': user, 'form': form})

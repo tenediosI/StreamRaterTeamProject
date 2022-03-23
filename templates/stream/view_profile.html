@@ -24,7 +24,6 @@
             <a class="info"><a class="info-tag">Bio: </a>{{ user.userprofile.bio }}</a><br/>
         </div>
         {% if user == current_user %}
-            <a style="opacity: 0;" id="button-link" href="{% url 'stream:edit_profile' %}">Edit</a>
             <a id="button-link" href="{% url 'stream:edit_profile' %}">Edit</a>
         {% endif %}
 

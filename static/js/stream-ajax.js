@@ -58,7 +58,6 @@ $(document).ready(function () {
         }
         $('#email').val('');
         $('#bio').val('');
-        alert("Profile Updated")
     }
 
 });
