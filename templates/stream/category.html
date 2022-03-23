@@ -1,4 +1,5 @@
 {% extends 'stream/base.html' %}
+{% load static %}
 
 {% block title_block %}
     {% if category %}
@@ -9,6 +10,7 @@
 {% endblock %}
 
 {% block body_block %}
+	<link rel="stylesheet" href="{% static 'style/genericPage.css' %}" type="text/css"/>
     <div>{{ category.name }}</div>
     <img src={{ category.image }}>
 	<div class="grid-container">
@@ -16,6 +18,7 @@
         {% if category == s.category %}
 			<div id="grid-item{{ forloop.counter }}">
                 <a href="{% url 'stream:show_streamer' name=s.name category_name_slug=category.slug %}"><img class="icon" src="{{ s.image }}"></a>
+				<a href="{% url 'stream:show_streamer' name=s.name category_name_slug=category.slug %}">{{ s.name }}</a>
 			</div>
         {% endif %}
     {% endfor %}
