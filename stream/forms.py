@@ -19,7 +19,7 @@ class UserForm(forms.ModelForm):
 
 
 class UserProfileForm(forms.ModelForm):
-    bio = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Tell us about you!',
+    bio = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': 'Tell us about you!',
                                                        'class': 'form-bio',
                                                        'rows': 3,
                                                        'cols': 40,

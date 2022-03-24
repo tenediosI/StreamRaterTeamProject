@@ -62,6 +62,8 @@ def add_comment(request, name='', category_name_slug=''):
             return redirect(reverse('stream:show_streamer',
                                     kwargs={'name': name,
                                             'category_name_slug': category_name_slug, }))
+        else:
+            print(form.errors)
     context_dict['form'] = form
     return render(request, 'stream/add_comment.html', context_dict)
 
@@ -83,6 +85,8 @@ def add_sub_comment(request,  id=0, name='', category_name_slug=''):
             return redirect(reverse('stream:show_streamer',
                                     kwargs={'name': name,
                                             'category_name_slug': category_name_slug,}))
+        else:
+            print(form.errors)
     context_dict['form'] = form
     return render(request, 'stream/add_sub_comment.html', context_dict)
 

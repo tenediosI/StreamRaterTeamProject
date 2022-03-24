@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'stream',
-    # 'registration',
-    #  'bootstrap_toolkit',
+    'stream.apps.StreamConfig',
+    #'stream',
+
 ]
 
 #registration config
@@ -145,7 +145,3 @@ STATICFILES_DIRS = [STATIC_DIR, ]
 #media files
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'
-
-#login
-# LOGIN_URL='/Stream_Rater/login/'
-# LOGOUT_URL=/'Stream_Rater/logout/'

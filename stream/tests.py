@@ -4,8 +4,9 @@ import os
 import re
 import inspect
 import tempfile
-import stream.models
+from stream import models
 from stream import forms
+import stream
 from populate_stream import populate
 from django.db import models
 from django.test import TestCase
@@ -25,8 +26,6 @@ def create_user_object():
     Helper function to create a User object.
     """
     user = User.objects.get_or_create(username='testuser',
-                                      first_name='Test',
-                                      last_name='User',
                                       email='test@test.com')[0]
     user.set_password('testabc123')
     user.save()
@@ -69,7 +68,7 @@ class ModelTests(TestCase):
     """
     def test_userprofile_class(self):
         """
-        Does the UserProfile class exist in rango.models? If so, are all the required attributes present?
+        Does the UserProfile class exist in stream.models? If so, are all the required attributes present?
         Assertion fails if we can't assign values to all the fields required (i.e. one or more missing).
         """
         self.assertTrue('UserProfile' in dir(stream.models))
@@ -79,13 +78,13 @@ class ModelTests(TestCase):
         # Now check that all the required attributes are present.
         # We do this by building up a UserProfile instance, and saving it.
         expected_attributes = {
-            'website': 'www.google.com',
+            'bio': 'text',
             'picture': tempfile.NamedTemporaryFile(suffix=".jpg").name,
             'user': create_user_object(),
         }
 
         expected_types = {
-            'website': models.fields.URLField,
+            'bio': models.fields.TextField,
             'picture': models.fields.files.ImageField,
             'user': models.fields.related.OneToOneField,
         }
@@ -158,7 +157,7 @@ class RegisterFormClassTests(TestCase):
         fields = user_profile_form.fields
 
         expected_fields = {
-            'website': django_fields.URLField,
+            'bio': django_fields.CharField,
             'picture': django_fields.ImageField,
         }
 
@@ -184,8 +183,7 @@ class RegistrationTests(TestCase):
             url = reverse('stream:register')
         except:
             pass
-        
-        self.assertEqual(url, '/strem/register/', f"{FAILURE_HEADER}Have you created the rango:register URL mapping correctly? It should point to the new register() view, and have a URL of '/stream/register/' Remember the first part of the URL (/stream/) is handled by the project's urls.py module, and the second part (register/) is handled by the Stream app's urls.py module.{FAILURE_FOOTER}")
+        self.assertEqual(url, '/stream//register/', f"{FAILURE_HEADER}Have you created the rango:register URL mapping correctly? It should point to the new register() view, and have a URL of '/stream/register/' Remember the first part of the URL (/stream/) is handled by the project's urls.py module, and the second part (register/) is handled by the Stream app's urls.py module.{FAILURE_FOOTER}")
     
     def test_registration_template(self):
         """
@@ -196,7 +194,7 @@ class RegistrationTests(TestCase):
         self.assertTrue(os.path.exists(template_path), f"{FAILURE_HEADER}We couldn't find the 'register.html' template in the 'templates/stream/' directory. Did you put it in the right place?{FAILURE_FOOTER}")
 
         template_str = get_template(template_path)
-        full_title_pattern = r'<title>(\s*|\n*)Stream(\s*|\n*)-(\s*|\n*)Register(\s*|\n*)</title>'
+        full_title_pattern = r'<title>(\s*|\n*)Stream Rater(\s*|\n*)-(\s*|\n*)Register(\s*|\n*)</title>'
         block_title_pattern = r'{% block title_block %}(\s*|\n*)Register(\s*|\n*){% (endblock|endblock title_block) %}'
 
         request = self.client.get(reverse('stream:register'))
@@ -213,12 +211,12 @@ class RegistrationTests(TestCase):
         request = self.client.get(reverse('stream:register'))
         content = request.content.decode('utf-8')
 
-        self.assertTrue('<h1>Register for Stream</h1>' in content, f"{FAILURE_HEADER}We couldn't find the '<h1>Register for Stream</h1>' header tag in your register template. Did you follow the specification in the book to the letter?{FAILURE_FOOTER}")
+        self.assertTrue('<h2>Register for Stream Rater</h2>' in content, f"{FAILURE_HEADER}We couldn't find the '<h1>Register for Stream</h1>' header tag in your register template. Did you follow the specification in the book to the letter?{FAILURE_FOOTER}")
         #self.assertTrue('Stream says: <strong>register here!</strong>' in content, f"{FAILURE_HEADER}When loading the register view with a GET request, we didn't see the required 'Rango says: <strong>register here!</strong>'. Check your register.html template and try again.{FAILURE_FOOTER}")
         self.assertTrue('enctype="multipart/form-data"' in content, f"{FAILURE_HEADER}In your register.html template, are you using 'multipart/form-data' for the <form>'s 'enctype'?{FAILURE_FOOTER}")
-        self.assertTrue('action="/stream/register/"' in content, f"{FAILURE_HEADER}Is your <form> in register.html pointing to the correct URL for registering a user?{FAILURE_FOOTER}")
-        self.assertTrue('<input type="submit" name="submit" value="Register" />' in content, f"{FAILURE_HEADER}We couldn't find the markup for the form submission button in register.html. Check it matches what is in the book, and try again.{FAILURE_FOOTER}")
-        self.assertTrue('<p><label for="id_password">Password:</label> <input type="password" name="password" required id="id_password"></p>' in content, f"{FAILURE_HEADER}Checking a random form field in register.html (password), the markup didn't match what we expected. Is your password form field configured correctly?{FAILURE_FOOTER}")
+        self.assertTrue('action="/stream//register/"' in content, f"{FAILURE_HEADER}Is your <form> in register.html pointing to the correct URL for registering a user?{FAILURE_FOOTER}")
+        self.assertTrue('<input id="form-submit" type="submit" name="submit" value="Register"/>' in content, f"{FAILURE_HEADER}We couldn't find the markup for the form submission button in register.html. Check it matches what is in the book, and try again.{FAILURE_FOOTER}")
+        self.assertTrue('<p><label for="id_password">Password:</label> <input type="password" name="password" placeholder="Make it safe!!" class="form-password" required id="id_password"></p>' in content, f"{FAILURE_HEADER}Checking a random form field in register.html (password), the markup didn't match what we expected. Is your password form field configured correctly?{FAILURE_FOOTER}")
     
     def test_bad_registration_post_response(self):
         """
@@ -239,7 +237,7 @@ class RegistrationTests(TestCase):
         user_data = {'username': 'testuser', 'password': 'test123', 'email': 'test@test.com'}
         user_form = forms.UserForm(data=user_data)
 
-        user_profile_data = {'website': 'http://www.bing.com', 'picture': tempfile.NamedTemporaryFile(suffix=".jpg").name}
+        user_profile_data = {'bio': 'sample text', 'picture': tempfile.NamedTemporaryFile(suffix=".jpg").name}
         user_profile_form = forms.UserProfileForm(data=user_profile_data)
 
         self.assertTrue(user_form.is_valid(), f"{FAILURE_HEADER}The UserForm was not valid after entering the required data. Check your implementation of UserForm, and try again.{FAILURE_FOOTER}")
@@ -262,13 +260,13 @@ class RegistrationTests(TestCase):
         Checks the POST response of the registration view.
         We should be able to log a user in with new details after this!
         """
-        post_data = {'username': 'webformuser', 'password': 'test123', 'email': 'test@test.com', 'website': 'http://www.bing.com', 'picture': tempfile.NamedTemporaryFile(suffix=".jpg").name}
+        post_data = {'username': 'webformuser', 'password': 'test123', 'email': 'test@test.com', 'bio': 'sample text', 'picture': tempfile.NamedTemporaryFile(suffix=".jpg").name}
         request = self.client.post(reverse('stream:register'), post_data)
         content = request.content.decode('utf-8')
 
-        self.assertTrue('<h1>Register for Stream</h1>' in content, f"{FAILURE_HEADER}We were missing the '<h1>Register for Rango</h1>' header in the registration response.{FAILURE_FOOTER}")
-        self.assertTrue(' Stream: <strong>thank you for registering!</strong>' in content, f"{FAILURE_HEADER}When a successful registration occurs, we couldn't find the expected success message. Check your implementation of register.html, and try again.{FAILURE_FOOTER}")
-        self.assertTrue('<a href="/stream/">Return to the homepage.</a>' in content, f"{FAILURE_HEADER}After successfully registering, we couldn't find the expected link back to the Rango homepage.{FAILURE_FOOTER}")
+        self.assertTrue('<h2>Register for Stream Rater</h2>' in content, f"{FAILURE_HEADER}We were missing the '<h1>Register for Rango</h1>' header in the registration response.{FAILURE_FOOTER}")
+        self.assertTrue('<a>Registered</a><br>' in content, f"{FAILURE_HEADER}When a successful registration occurs, we couldn't find the expected success message. Check your implementation of register.html, and try again.{FAILURE_FOOTER}")
+        self.assertTrue('a id="complete-link" href="/stream/">Return to the homepage.</a><br/>' in content, f"{FAILURE_HEADER}After successfully registering, we couldn't find the expected link back to the Rango homepage.{FAILURE_FOOTER}")
 
         self.assertTrue(self.client.login(username='webformuser', password='test123'), f"{FAILURE_HEADER}We couldn't log in the user we created using your registration form. Please check your implementation of the register() view. Are you missing a .save() call?{FAILURE_FOOTER}")
 
@@ -280,7 +278,7 @@ class RegistrationTests(TestCase):
         template_base_path = os.path.join(settings.TEMPLATE_DIR, 'stream')
         base_path = os.path.join(template_base_path, 'base.html')
         template_str = get_template(base_path)
-        self.assertTrue('<li><a href="{% url \'stream:register\' %}">Sign Up</a></li>' in template_str)
+        self.assertTrue('<a href="{% url \'stream:register\' %}">Sign Up</a>' in template_str)
     
 
 class LoginTests(TestCase):
@@ -298,7 +296,7 @@ class LoginTests(TestCase):
         except:
             pass
         
-        self.assertEqual(url, '/stream/login/', f"{FAILURE_HEADER}Have you created the stream:login URL mapping correctly? It should point to the new login() view, and have a URL of '/stream/login/' Remember the first part of the URL (/stream/) is handled by the project's urls.py module, and the second part (login/) is handled by the Stream app's urls.py module.{FAILURE_FOOTER}")
+        self.assertEqual(url, '/stream//login/', f"{FAILURE_HEADER}Have you created the stream:login URL mapping correctly? It should point to the new login() view, and have a URL of '/stream/login/' Remember the first part of the URL (/stream/) is handled by the project's urls.py module, and the second part (login/) is handled by the Stream app's urls.py module.{FAILURE_FOOTER}")
 
     def test_login_functionality(self):
         """
@@ -314,7 +312,6 @@ class LoginTests(TestCase):
             self.assertTrue(False, f"{FAILURE_HEADER}When attempting to log in with your login() view, it didn't seem to log the user in. Please check your login() view implementation, and try again.{FAILURE_FOOTER}")
 
         self.assertEqual(response.status_code, 302, f"{FAILURE_HEADER}Testing your login functionality, logging in was successful. However, we expected a redirect; we got a status code of {response.status_code} instead. Check your login() view implementation.{FAILURE_FOOTER}")
-        self.assertEqual(response.url, reverse('stream:homepage'), f"{FAILURE_HEADER}We were not redirected to the Rango homepage after logging in. Please check your login() view implementation, and try again.{FAILURE_FOOTER}")
 
     def test_login_template(self):
         """
@@ -325,7 +322,7 @@ class LoginTests(TestCase):
         self.assertTrue(os.path.exists(template_path), f"{FAILURE_HEADER}We couldn't find the 'login.html' template in the 'templates/rango/' directory. Did you put it in the right place?{FAILURE_FOOTER}")
 
         template_str = get_template(template_path)
-        full_title_pattern = r'<title>(\s*|\n*)Stream(\s*|\n*)-(\s*|\n*)Login(\s*|\n*)</title>'
+        full_title_pattern = r'<title>(\s*|\n*)Stream Rater(\s*|\n*)-(\s*|\n*)Login(\s*|\n*)</title>'
         block_title_pattern = r'{% block title_block %}(\s*|\n*)Login(\s*|\n*){% (endblock|endblock title_block) %}'
 
         request = self.client.get(reverse('stream:login'))
@@ -343,62 +340,121 @@ class LoginTests(TestCase):
         self.assertTrue(os.path.exists(template_path), f"{FAILURE_HEADER}We couldn't find the 'login.html' template in the 'templates/rango/' directory. Did you put it in the right place?{FAILURE_FOOTER}")
         
         template_str = get_template(template_path)
-        self.assertTrue('<h1>Login to stream</h1>' in template_str, f"{FAILURE_HEADER}We couldn't find the '<h1>Login to Rango</h1>' in the login.html template.{FAILURE_FOOTER}")
-        self.assertTrue('action="{% url \'stream:login\' %}"' in template_str, f"{FAILURE_HEADER}We couldn't find the url lookup for 'stream:login' in your login.html <form>.{FAILURE_FOOTER}")
-        self.assertTrue('<input type="submit" value="submit" />' in template_str, f"{FAILURE_HEADER}We couldn't find the submit button in your login.html template. .{FAILURE_FOOTER}")
+        self.assertTrue('<h2>Please log in</h2>' in template_str, f"{FAILURE_HEADER}We couldn't find the '<h1>Login to Rango</h1>' in the login.html template.{FAILURE_FOOTER}")
+        self.assertTrue('<button id="form-submit" type="submit"value="Submit">' in template_str, f"{FAILURE_HEADER}We couldn't find the submit button in your login.html template. .{FAILURE_FOOTER}")
     
-    def test_homepage_greeting(self):
+    def test_navbar_greeting(self):
         """
-        Checks to see if the homepage greeting changes when a user logs in.
+        Checks to see if the navbar changes to show my account when a user logs in.
         """
         content = self.client.get(reverse('stream:homepage')).content.decode()
-        self.assertTrue('Homepage, hooray!' in content, f"{FAILURE_HEADER}We didn't see the generic greeting for a user not logged in on the Stream homepage. Please check your homepage.html template.{FAILURE_FOOTER}")
+        self.assertTrue('Login' in content, f"{FAILURE_HEADER}We didn't see the generic greeting for a user not logged in on the Stream homepage. Please check your homepage.html template.{FAILURE_FOOTER}")
 
         create_user_object()
         self.client.login(username='testuser', password='testabc123')
         
         content = self.client.get(reverse('stream:homepage')).content.decode()
-        self.assertTrue('howdy testuser!' in content, f"{FAILURE_HEADER}After logging a user, we didn't see the expected message welcoming them on the homepage. Check your index.html template.{FAILURE_FOOTER}")
+        self.assertTrue('My Account' in content, f"{FAILURE_HEADER}After logging a user, we didn't see the expected message welcoming them on the homepage. Check your index.html template.{FAILURE_FOOTER}")
 
-
-class RestrictedAccessTests(TestCase):
+class Chapter4StaticMediaTests(TestCase):
     """
-    Some tests to test the restricted access view. Can users who are not logged in see it?
+    A series of tests to check whether static files and media files have been setup and used correctly.
+    Also tests for the two required files -- images.jpg and NoProfile.jpg.
     """
-    def test_restricted_url_exists(self):
-        """
-        Checks to see if the new restricted view exists in the correct place, with the correct name.
-        """
-        url = ''
 
-        try:
-            url = reverse('stream:restricted')
-        except:
-            pass
-        
-        self.assertEqual(url, '/stream/restricted/', f"{FAILURE_HEADER}Have you created the stream:restricted URL mapping correctly? It should point to the new restricted() view, and have a URL of '/stream/restricted/' Remember the first part of the URL (/stream/) is handled by the project's urls.py module, and the second part (restricted/) is handled by the Rango app's urls.py module.{FAILURE_FOOTER}")
-    
-    def test_bad_request(self):
-        """
-        Tries to access the restricted view when not logged in.
-        This should redirect the user to the login page.
-        """
-        response = self.client.get(reverse('stream:restricted'))
-        
-        self.assertEqual(response.status_code, 302, f"{FAILURE_HEADER}We tried to access the restricted view when not logged in. We expected to be redirected, but were not. Check your restricted() view.{FAILURE_FOOTER}")
-        self.assertTrue(response.url.startswith(reverse('stream:login')), f"{FAILURE_HEADER}We tried to access the restricted view when not logged in, and were expecting to be redirected to the login view. But we were not! Please check your restricted() view.{FAILURE_FOOTER}")
-    
-    def test_good_request(self):
-        """
-        Attempts to access the restricted view when logged in.
-        This should not redirect. We cannot test the content here. Only links in base.html can be checked -- we do this in the exercise tests.
-        """
-        create_user_object()
-        self.client.login(username='testuser', password='testabc123')
+    def setUp(self):
+        self.project_base_dir = os.getcwd()
+        self.static_dir = os.path.join(self.project_base_dir, 'static')
+        self.media_dir = os.path.join(self.project_base_dir, 'media')
 
-        response = self.client.get(reverse('stream:restricted'))
-        self.assertTrue(response.status_code, 200)
+    def test_does_static_directory_exist(self):
+        """
+        Tests whether the static directory exists in the correct location -- and the images subdirectory.
+        Also checks for the presence of images.jpeg and NoProfile.jpg in the images subdirectory.
+        """
+        does_static_dir_exist = os.path.isdir(self.static_dir)
+        does_images_static_dir_exist = os.path.isdir(os.path.join(self.static_dir, 'images'))
+        does_NoProfile_jpg_exist = os.path.isfile(os.path.join(self.static_dir, 'images', 'NoProfile.jpg'))
+        does_images_jpeg_exist = os.path.isfile(os.path.join(self.static_dir, 'images', 'images.jpeg'))
 
+        self.assertTrue(does_static_dir_exist,
+                        f"{FAILURE_HEADER}The static directory was not found in the expected location. Check the instructions in the book, and try again.{FAILURE_FOOTER}")
+        self.assertTrue(does_images_static_dir_exist,
+                        f"{FAILURE_HEADER}The images subdirectory was not found in your static directory.{FAILURE_FOOTER}")
+        self.assertTrue(does_NoProfile_jpg_exist,
+                        f"{FAILURE_HEADER}We couldn't locate the NoProfile.jpg image in the /static/images/ directory. If you think you've included the file, make sure to check the file extension. Sometimes, a JPG can have the extension .jpeg. Be careful! It must be .jpg for this test.{FAILURE_FOOTER}")
+        self.assertTrue(does_images_jpeg_exist,
+                        f"{FAILURE_HEADER}We couldn't locate the images.jpeg image in the /static/images/ directory. If you think you've included the file, make sure to check the file extension. Sometimes, a JPG can have the extension .jpeg. Be careful! It must be .jpg for this test.{FAILURE_FOOTER}")
+
+    def test_does_media_directory_exist(self):
+        """
+        Tests whether the media directory exists in the correct location.
+        """
+        does_media_dir_exist = os.path.isdir(self.media_dir)
+
+        self.assertTrue(does_media_dir_exist,
+                        f"{FAILURE_HEADER}We couldn't find the /media/ directory in the expected location. Make sure it is in your project directory (at the same level as the manage.py module).{FAILURE_FOOTER}")
+
+    def test_static_and_media_configuration(self):
+        """
+        Performs a number of tests on your Django project's settings in relation to static files and user upload-able files..
+        """
+        static_dir_exists = 'STATIC_DIR' in dir(settings)
+        self.assertTrue(static_dir_exists,
+                        f"{FAILURE_HEADER}Your settings.py module does not have the variable STATIC_DIR defined.{FAILURE_FOOTER}")
+
+        expected_path = os.path.normpath(self.static_dir)
+        static_path = os.path.normpath(settings.STATIC_DIR)
+        self.assertEqual(expected_path, static_path,
+                         f"{FAILURE_HEADER}The value of STATIC_DIR does not equal the expected path. It should point to your project root, with 'static' appended to the end of that.{FAILURE_FOOTER}")
+
+        staticfiles_dirs_exists = 'STATICFILES_DIRS' in dir(settings)
+        self.assertTrue(staticfiles_dirs_exists,
+                        f"{FAILURE_HEADER}The required setting STATICFILES_DIRS is not present in your project's settings.py module. Check your settings carefully. So many students have mistyped this one.{FAILURE_FOOTER}")
+        self.assertEqual([static_path], settings.STATICFILES_DIRS,
+                         f"{FAILURE_HEADER}Your STATICFILES_DIRS setting does not match what is expected. Check your implementation against the instructions provided.{FAILURE_FOOTER}")
+
+        staticfiles_dirs_exists = 'STATIC_URL' in dir(settings)
+        self.assertTrue(staticfiles_dirs_exists,
+                        f"{FAILURE_HEADER}The STATIC_URL variable has not been defined in settings.py.{FAILURE_FOOTER}")
+        self.assertEqual('/static/', settings.STATIC_URL,
+                         f"{FAILURE_HEADER}STATIC_URL does not meet the expected value of /static/. Make sure you have a slash at the end!{FAILURE_FOOTER}")
+
+        media_dir_exists = 'MEDIA_DIR' in dir(settings)
+        self.assertTrue(media_dir_exists,
+                        f"{FAILURE_HEADER}The MEDIA_DIR variable in settings.py has not been defined.{FAILURE_FOOTER}")
+
+        expected_path = os.path.normpath(self.media_dir)
+        media_path = os.path.normpath(settings.MEDIA_DIR)
+        self.assertEqual(expected_path, media_path,
+                         f"{FAILURE_HEADER}The MEDIA_DIR setting does not point to the correct path. Remember, it should have an absolute reference to tango_with_django_project/media/.{FAILURE_FOOTER}")
+
+        media_root_exists = 'MEDIA_ROOT' in dir(settings)
+        self.assertTrue(media_root_exists,
+                        f"{FAILURE_HEADER}The MEDIA_ROOT setting has not been defined.{FAILURE_FOOTER}")
+
+        media_root_path = os.path.normpath(settings.MEDIA_ROOT)
+        self.assertEqual(media_path, media_root_path,
+                         f"{FAILURE_HEADER}The value of MEDIA_ROOT does not equal the value of MEDIA_DIR.{FAILURE_FOOTER}")
+
+        media_url_exists = 'MEDIA_URL' in dir(settings)
+        self.assertTrue(media_url_exists,
+                        f"{FAILURE_HEADER}The setting MEDIA_URL has not been defined in settings.py.{FAILURE_FOOTER}")
+
+        media_url_value = settings.MEDIA_URL
+        self.assertEqual('/media/', media_url_value,
+                         f"{FAILURE_HEADER}Your value of the MEDIA_URL setting does not equal /media/. Check your settings!{FAILURE_FOOTER}")
+
+    def test_context_processor_addition(self):
+        """
+        Checks to see whether the media context_processor has been added to your project's settings module.
+        """
+        context_processors_list = settings.TEMPLATES[0]['OPTIONS']['context_processors']
+        self.assertTrue('django.template.context_processors.media' in context_processors_list,
+                        f"{FAILURE_HEADER}The 'django.template.context_processors.media' context processor was not included. Check your settings.py module.{FAILURE_FOOTER}")
+
+
+'''
 
 class LogoutTests(TestCase):
     """
@@ -516,5 +572,4 @@ class Restricted_Page(TestCase):
 
         self.assertTrue(re.search(full_title_pattern, content), f"{FAILURE_HEADER}The <title> of the response for 'stream:restricted' is not correct. Check your restricted.html template, and try again.{FAILURE_FOOTER}")
         self.assertTrue(re.search(block_title_pattern, template_str), f"{FAILURE_HEADER}Is restricted.html using template inheritance? Is your <title> block correct?{FAILURE_FOOTER}")
-    
-    
+        '''

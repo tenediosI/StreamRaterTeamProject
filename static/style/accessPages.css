@@ -101,6 +101,25 @@ body{
     transition: .5s;
 }
 
-.profile-block .registered-confirmation{
+.registered-confirmation{
     padding: 20px;
+}
+
+#complete-link{
+    background-color: #2e3087;
+    border: 1px solid;
+    color: white;
+    padding: 5px 7px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 8px;
+    margin: 10px 10px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+#complete-link:hover{
+    border-color: #2e3087;
+    transition: .5s;
 }

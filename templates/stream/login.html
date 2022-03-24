@@ -1,18 +1,18 @@
 {% extends 'stream/base.html' %}
 {% load static %}
 
+{% block title_block %}
+    Login
+{% endblock %}
+
 <div class="signinform">
 {% block body_block %}
     <link rel="stylesheet" href="{% static 'style/accessPages.css' %}" type="text/css" />
-    <!-- Custom styles for this template -->
-    <!--<link href=
-                  "http://v4-alpha.getbootstrap.com/examples/dashboard/dashboard.css"
-          rel="stylesheet">-->
     <div class="form-block">
         <br/>
         <form class="form-signin" role="form" method="post" action=".">
             {% csrf_token %}
-            <h2>Please sign in</h2>
+            <h2>Please log in</h2>
             <br/>
             <label>Username</label>
             <input type="text" name="username" id="html-input" class="form-username"
