@@ -13,7 +13,7 @@
         {% for c in categories %}
 			<div id="grid-item{{ forloop.counter }}">
                 <a href="{% url 'stream:show_category' category_name_slug=c.slug %}"><img class="icon" src="{{ c.image }}"></a>
-				<strong><a href="{% url 'stream:show_category' category_name_slug=c.slug %}">{{ c.name }}</a></strong>
+				<!--<strong><a href="{% url 'stream:show_category' category_name_slug=c.slug %}">{{ c.name }}</a></strong>-->
 			</div>
         {% endfor %}
     {% else %}
