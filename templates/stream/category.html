@@ -11,8 +11,9 @@
 
 {% block body_block %}
 	<link rel="stylesheet" href="{% static 'style/genericPage.css' %}" type="text/css"/>
-    <div>{{ category.name }}</div>
-    <img src={{ category.image }}>
+    <link rel="stylesheet" href="{% static 'style/categoryExtra.css' %}" type="text/css"/>
+	<img src={{ category.image }}>
+	<div>{{ category.name }}</div>
 	<div class="grid-container">
     {% for s in streamers %}
         {% if category == s.category %}

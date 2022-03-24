@@ -104,7 +104,7 @@ def createDataDict():
             streamer_dict = {
                 "name": streamer["user_name"],
                 "title" : streamer["title"],
-                "image" : users_data[count]["profile_image_url"].replace("{width}x{height}","188x250"),
+                "image" : users_data[count]["profile_image_url"].replace("{width}x{height}","100x100"),
                 "views" : users_data[count]["view_count"]
                 }
             game_list.append(streamer_dict)
