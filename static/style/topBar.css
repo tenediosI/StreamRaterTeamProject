@@ -5,6 +5,8 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
 	overflow: scroll;
+    background: linear-gradient(45deg, darkslateblue, slategray);
+    position: relative;
 }
 
 .navbar {
@@ -78,7 +80,8 @@ body {
   position: absolute;
   background: white;
   border-radius: 10px;
-} 
+}
+
 
 .grid-container div {
 	float: left;

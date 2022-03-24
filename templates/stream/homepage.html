@@ -7,17 +7,18 @@
 {% endblock %}
 
 {% block body_block %}
-	<link rel="stylesheet" href="{% static 'style/genericPage.css' %}" type="text/css"/>
-    <div class="grid-container">
-    {% if categories %}
-        {% for c in categories %}
-			<div id="grid-item{{ forloop.counter }}">
-                <a href="{% url 'stream:show_category' category_name_slug=c.slug %}"><img class="icon" src="{{ c.image }}"></a>
-				<!--<strong><a href="{% url 'stream:show_category' category_name_slug=c.slug %}">{{ c.name }}</a></strong>-->
-			</div>
-        {% endfor %}
-    {% else %}
-        <li><strong>There are no categories present.</strong></li>
-    {% endif %}
-	</div>
+    <link rel="stylesheet" href="{% static 'style/homepageExtra.css' %}" type="text/css"/>
+    <div id="container">
+        <div class="grid-container">
+        {% if categories %}
+            {% for c in categories %}
+                <div id="grid-item{{ forloop.counter }}">
+                    <a href="{% url 'stream:show_category' category_name_slug=c.slug %}"><img class="icon" src="{{ c.image }}"></a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <li><strong>There are no categories present.</strong></li>
+        {% endif %}
+        </div>
+    </div>
 {% endblock %}
