@@ -9,17 +9,12 @@ from django.contrib.auth.decorators import login_required
 from stream.webhose_search import run_query
 
 def homepage(request):
-    context_dict = {}
-    context_dict['categories'] = Category.objects.all()
-    context_dict['streamers'] = Streamer.objects.all()
-    response = render(request, 'stream/homepage.html', context=context_dict)
+    response = render(request, 'stream/homepage.html', context={'categories':Category.objects.all()})
     return response
-
 
 def about(request):
     context_dict = {}
     return render(request, 'stream/about.html', context=context_dict)
-
 
 def show_category(request, category_name_slug):
     context_dict = {}
@@ -89,7 +84,6 @@ def add_sub_comment(request,  id=0, name='', category_name_slug=''):
             print(form.errors)
     context_dict['form'] = form
     return render(request, 'stream/add_sub_comment.html', context_dict)
-
 
 def show_streamer(request, name='', category_name_slug=''):
     context_dict = {}
@@ -190,7 +184,8 @@ def view_profile(request, username=''):
         context_dict['user'] = User.objects.get(username=username)
         context_dict['current_user'] = request.user
         return render(request, 'stream/view_profile.html', context_dict)
-    except:
+    except Exception as e:
+        print(e)
         logout(request)
         return HttpResponseRedirect(reverse('homepage'))
 

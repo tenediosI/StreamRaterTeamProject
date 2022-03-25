@@ -53,7 +53,7 @@ def create_category_object():
 
 def create_streamer_object():
     """
-    Helper functio to create a streamer object
+    Helper function to create a streamer object
     """
     streamer = Streamer.objects.get_or_create(category=create_category_object(),
                                              name='teststreamer',
@@ -62,6 +62,17 @@ def create_streamer_object():
                                              views='0')[0]
     streamer.save()
     return streamer
+
+def create_comment_object():
+    """
+    Helper function to create a comment
+    """
+    comment = Comment.objects.get_or_create(streamer=create_streamer_object(),
+                                            user_name='testuser',
+                                            rating=3,
+                                            text='sample text')[0]
+    comment.save()
+    return comment
 
 def get_template(path_to_template):
     """
@@ -606,7 +617,7 @@ class CommentPages(TestCase):
     Checks that comment pages work
     '''
     def test_streamer_page(self):
-        create_streamer_object()
+        create_comment_object()
 
         template_base_path = os.path.join(settings.TEMPLATE_DIR, 'stream')
         template_streamer_path = os.path.join(template_base_path, 'streamer.html')
@@ -624,7 +635,9 @@ class CommentPages(TestCase):
         self.assertTrue('<h1 id="streamer-name">teststreamer</h1>' in content, f"{FAILURE_HEADER}We are missing the streamer name header in the streamer response.{FAILURE_FOOTER}")
         self.assertTrue('Category: <a>testcategory</a>' in content, f"{FAILURE_HEADER}We are missing category name{FAILURE_FOOTER}")
         self.assertTrue('Views this month: <a>0</a>' in content, f"{FAILURE_HEADER}We are missing monthly views{FAILURE_FOOTER}")
-        self.assertTrue('Rating: <a>No rating yet</a>' in content, f"{FAILURE_HEADER}We are missing rating{FAILURE_FOOTER}")
+        self.assertTrue('Rating: <a>3.0</a>' in content, f"{FAILURE_HEADER}We are missing rating{FAILURE_FOOTER}")
+        self.assertTrue('<div class="comment-header"><a class="user-name" href="/stream//testuser/">testuser</a><a class="date">    March 25, 2022</a><br/>' in content, f"{FAILURE_HEADER}Missing test comment{FAILURE_FOOTER}")
+
 
     def test_streamer_page_logged_in(self):
         create_streamer_object()
@@ -732,7 +745,7 @@ class AdminInterfaceTests(TestCase):
         User.objects.create_superuser('testAdmin', 'email@email.com', 'adminPassword123')
         self.client.login(username='testAdmin', password='adminPassword123')
 
-        create_streamer_object()
+        create_comment_object()
 
     def test_admin_interface_accessible(self):
         response = self.client.get('/admin/')
@@ -760,6 +773,26 @@ class AdminInterfaceTests(TestCase):
         self.assertTrue('Sub_Comments' in response_body,
                         f"{FAILURE_HEADER}The Sub_Comment model was not found in the admin interface. If you did add the model to admin.py, did you add the correct plural spelling (Sub_Comments)?{FAILURE_FOOTER}")
 
+    def test_comment_display_changes(self):
+        """
+        Checks to see whether the Page model has had the required changes applied for presentation in the admin interface.
+        """
+        response = self.client.get('/admin/stream/comment/')
+        response_body = response.content.decode()
+
+        # Headers -- are they all present?
+        self.assertTrue('<div class="text"><a href="?o=1">ID</a></div>' in response_body,
+                        f"{FAILURE_HEADER}ID column not present in admin{FAILURE_FOOTER}")
+        self.assertTrue('<div class="text"><a href="?o=2">User name</a></div>' in response_body,
+                        f"{FAILURE_HEADER}User name column not present in admin{FAILURE_FOOTER}")
+        self.assertTrue('<div class="text"><a href="?o=3">Date</a></div>' in response_body,
+                        f"{FAILURE_HEADER}Date column not present in admin{FAILURE_FOOTER}")
+
+        # Is the teststreamer page present, and in order?
+        expected_str = '<tr class="row1"><td class="action-checkbox"><input type="checkbox" name="_selected_action" value="1" class="action-select"></td><th class="field-id"><a href="/admin/stream/comment/1/change/">1</a></th><td class="field-user_name">testuser</td><td class="field-date nowrap">March 25, 2022</td></tr>'
+        self.assertTrue(expected_str in response_body,
+                        f"{FAILURE_HEADER}Couldn't find generated streamer listed{FAILURE_FOOTER}")
+
     def test_streamer_display_changes(self):
         """
         Checks to see whether the Page model has had the required changes applied for presentation in the admin interface.
@@ -775,7 +808,7 @@ class AdminInterfaceTests(TestCase):
         self.assertTrue('<div class="text"><a href="?o=3">Rating</a></div>' in response_body,
                         f"{FAILURE_HEADER}Rating column not present in admin{FAILURE_FOOTER}")
 
-        # Is the TestPage1 page present, and in order?
+        # Is the teststreamer page present, and in order?
         expected_str = '<tr class="row1"><td class="action-checkbox"><input type="checkbox" name="_selected_action" value="1" class="action-select"></td><th class="field-name"><a href="/admin/stream/streamer/1/change/">teststreamer</a></th><td class="field-category nowrap">testcategory</td><td class="field-rating">0.0</td></tr>'
         self.assertTrue(expected_str in response_body,
                         f"{FAILURE_HEADER}Couldn't find generated streamer listed{FAILURE_FOOTER}")

@@ -42,7 +42,8 @@ class UserProfile(models.Model):
         return self.user.username
 
 
-# Main comments have rating and relate to a user with a one-to-many relationship
+# Main comments have rating and relate to a streamer with a one-to-many relationship
+# They also hold the name of the user that wrote them in a one-to-many relationship
 class Comment(models.Model):
     user_name = models.CharField(default="Unknown", max_length=32)
     streamer = models.ForeignKey(Streamer, related_name="comments", on_delete=models.CASCADE)

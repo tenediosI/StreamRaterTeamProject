@@ -1,8 +1,9 @@
 from django.contrib import admin
 from stream.models import Category, Streamer, UserProfile, Comment, SubComment
 
-
-
+"""
+Logs in objects to show relevant information without overwhelming the admin
+"""
 
 class StreamerAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'rating',)
