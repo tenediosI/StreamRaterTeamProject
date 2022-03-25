@@ -18,12 +18,7 @@
             <p class="info-bits">
                 Category: <a>{{ category.name }}</a><br/>
                 Views this month: <a>{{ streamer.views }}</a><br/>
-                Rating: <a>
-                {% if streamer.rating == 0 %}
-                    No rating yet
-                {% else %}
-                    {{ streamer.rating }}
-                {% endif %}</a>
+                Rating: <a>{% if streamer.rating == 0 %}No rating yet{% else %}{{ streamer.rating }}{% endif %}</a>
             </p>
         </div>
         <div id="comment-section">

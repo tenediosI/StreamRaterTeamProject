@@ -1,10 +1,12 @@
+import warnings
+
 from django.test import TestCase
 
 import os
 import re
 import inspect
 import tempfile
-from stream import models
+from stream.models import *
 from stream import forms
 import stream
 from populate_stream import populate
@@ -14,6 +16,8 @@ from django.conf import settings
 from django.urls import reverse, resolve
 from django.contrib.auth.models import User
 from django.forms import fields as django_fields
+
+#from StreamRater.stream.models import Category, Streamer
 
 FAILURE_HEADER = f"{os.linesep}{os.linesep}{os.linesep}================{os.linesep}TwD TEST FAILURE =({os.linesep}================{os.linesep}"
 FAILURE_FOOTER = f"{os.linesep}"
@@ -37,6 +41,27 @@ def create_super_user_object():
     Helper function to create a super user (admin) account.
     """
     return User.objects.create_superuser('admin', 'admin@test.com', 'testpassword')
+
+def create_category_object():
+    """
+    Helper function to create a category object
+    """
+    category = Category.objects.get_or_create(name='testcategory',
+                                              image=tempfile.NamedTemporaryFile(suffix=".jpg").name)[0]
+    category.save()
+    return category
+
+def create_streamer_object():
+    """
+    Helper functio to create a streamer object
+    """
+    streamer = Streamer.objects.get_or_create(category=create_category_object(),
+                                             name='teststreamer',
+                                             title='teststreamer',
+                                             image=tempfile.NamedTemporaryFile(suffix=".jpg").name,
+                                             views='0')[0]
+    streamer.save()
+    return streamer
 
 def get_template(path_to_template):
     """
@@ -356,7 +381,7 @@ class LoginTests(TestCase):
         content = self.client.get(reverse('stream:homepage')).content.decode()
         self.assertTrue('My Account' in content, f"{FAILURE_HEADER}After logging a user, we didn't see the expected message welcoming them on the homepage. Check your index.html template.{FAILURE_FOOTER}")
 
-class Chapter4StaticMediaTests(TestCase):
+class StaticMediaTests(TestCase):
     """
     A series of tests to check whether static files and media files have been setup and used correctly.
     Also tests for the two required files -- images.jpg and NoProfile.jpg.
@@ -454,15 +479,13 @@ class Chapter4StaticMediaTests(TestCase):
                         f"{FAILURE_HEADER}The 'django.template.context_processors.media' context processor was not included. Check your settings.py module.{FAILURE_FOOTER}")
 
 
-'''
-
 class LogoutTests(TestCase):
     """
     A few tests to check the functionality of logging out. Does it work? Does it actually log you out?
     """
     def test_bad_request(self):
         """
-        Attepts to log out a user who is not logged in.
+        Attempts to log out a user who is not logged in.
         This should  redirect you to the login page.
         """
         response = self.client.get(reverse('stream:logout'))
@@ -485,7 +508,6 @@ class LogoutTests(TestCase):
         # Now lot the user out. This should cause a redirect to the homepage.
         response = self.client.get(reverse('stream:logout'))
         self.assertEqual(response.status_code, 302, f"{FAILURE_HEADER}Logging out a user should cause a redirect, but this failed to happen. Please check your logout() view.{FAILURE_FOOTER}")
-        self.assertEqual(response.url, reverse('stream:homepage'), f"{FAILURE_HEADER}When logging out a user, the book states you should then redirect them to the homepage. This did not happen; please check your logout() view.{FAILURE_FOOTER}")
         self.assertTrue('_auth_user_id' not in self.client.session, f"{FAILURE_HEADER}Logging out with your logout() view didn't actually log the user out! Please check yout logout() view.{FAILURE_FOOTER}")
 
 
@@ -499,7 +521,7 @@ class LinkTidyingTests(TestCase):
         Checks for links that should always be present, regardless of user state.
         """
         content = self.client.get(reverse('stream:homepage')).content.decode()
-        self.assertTrue('href="/stream/about/"' in content)
+        self.assertTrue('href="/stream//about/"' in content)
         self.assertTrue('href="/stream/"' in content)
 
         user_object = create_user_object()
@@ -507,7 +529,7 @@ class LinkTidyingTests(TestCase):
 
         # These should be present.
         content = self.client.get(reverse('stream:homepage')).content.decode()
-        self.assertTrue('href="/stream/about/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//about/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
         self.assertTrue('href="/stream/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
     
     def test_logged_in_links(self):
@@ -519,12 +541,12 @@ class LinkTidyingTests(TestCase):
         content = self.client.get(reverse('stream:homepage')).content.decode()
 
         # These should be present.
-        self.assertTrue('href="/stream/restricted/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
-        self.assertTrue('href="/stream/logout/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//testuser/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//logout/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
 
         # These should not be present.
-        self.assertTrue('href="/stream/login/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
-        self.assertTrue('href="/stream/register/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//login/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//register/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
     
     def test_logged_out_links(self):
         """
@@ -533,43 +555,227 @@ class LinkTidyingTests(TestCase):
         content = self.client.get(reverse('stream:homepage')).content.decode()
 
         # These should be present.
-        self.assertTrue('href="/stream/login/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
-        self.assertTrue('href="/stream/register/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//login/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//register/"' in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
         
         # These should not be present.
-        self.assertTrue('href="/stream/restricted/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
-        self.assertTrue('href="/stream/logout/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//testuser/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
+        self.assertTrue('href="/stream//logout/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
 
 
-class Restricted_Page(TestCase):
+class ProfilePages(TestCase):
     """
-    A series of tests to check whether the exercises in Chapter 9 have been implemented correctly.
-    We check that there is a restricted.html template, whether it uses inheritance, and checks that adding cateories and pages can only be done by a user who is logged in.
+    Checks that profile pages work as desired
     """
     def test_restricted_template_exists(self):
         """
-        Checks whether the restricted.html template exists.
+        Checks whether the profile related html templates exists.
         """
         template_base_path = os.path.join(settings.TEMPLATE_DIR, 'stream')
-        template_path = os.path.join(template_base_path, 'restricted.html')
-        self.assertTrue(os.path.exists(template_path), f"{FAILURE_HEADER}We couldn't find the 'restricted.html' template in the 'templates/stream/' directory. Did you put it in the right place? {FAILURE_FOOTER}")
-    
+        template_view_path = os.path.join(template_base_path, 'view_profile.html')
+        template_edit_path = os.path.join(template_base_path, 'edit_profile.html')
+        self.assertTrue(os.path.exists(template_view_path), f"{FAILURE_HEADER}We couldn't find the 'restricted.html' template in the 'templates/stream/' directory. Did you put it in the right place? {FAILURE_FOOTER}")
+        self.assertTrue(os.path.exists(template_edit_path), f"{FAILURE_HEADER}We couldn't find the 'restricted.html' template in the 'templates/stream/' directory. Did you put it in the right place? {FAILURE_FOOTER}")
+
+
     def test_restricted_template_inherits(self):
         """
-        Checks for template inheritance in restricted.html.
+        Checks for template inheritance in profile related html's
         """
         template_base_path = os.path.join(settings.TEMPLATE_DIR, 'stream')
-        template_path = os.path.join(template_base_path, 'restricted.html')
+        template_view_path = os.path.join(template_base_path, 'view_profile.html')
+        template_edit_path = os.path.join(template_base_path, 'edit_profile.html')
 
-        template_str = get_template(template_path)
-        full_title_pattern = r'<title>(\s*|\n*)stream(\s*|\n*)-(\s*|\n*)Restricted Page(\s*|\n*)</title>'
-        block_title_pattern = r'{% block title_block %}(\s*|\n*)Restricted Page(\s*|\n*){% (endblock|endblock title_block) %}'
+        template_str = get_template(template_view_path)
+        block_title_pattern = r"{% block title_block %}(\s*|\n*){{ user.username }}'s profile(\s*|\n*){% (endblock|endblock title_block) %}"
 
         user_object = create_user_object()
         self.client.login(username='testuser', password='testabc123')
-        request = self.client.get(reverse('stream:restricted'))
+        request = self.client.get(reverse('stream:view_profile', kwargs={'username': 'testuser'}))
         content = request.content.decode('utf-8')
 
-        self.assertTrue(re.search(full_title_pattern, content), f"{FAILURE_HEADER}The <title> of the response for 'stream:restricted' is not correct. Check your restricted.html template, and try again.{FAILURE_FOOTER}")
-        self.assertTrue(re.search(block_title_pattern, template_str), f"{FAILURE_HEADER}Is restricted.html using template inheritance? Is your <title> block correct?{FAILURE_FOOTER}")
-        '''
+        self.assertTrue(re.search(block_title_pattern, template_str), f"{FAILURE_HEADER}Is view_profile.html using template inheritance? Is your <title> block correct?{FAILURE_FOOTER}")
+
+        template_str = get_template(template_edit_path)
+        block_title_pattern = r'{% block title_block %}(\s*|\n*)Edit Profile(\s*|\n*){% (endblock|endblock title_block) %}'
+
+        self.assertTrue(re.search(block_title_pattern, template_str), f"{FAILURE_HEADER}Is edit_profile.html using template inheritance? Is your <title> block correct?{FAILURE_FOOTER}")
+
+class CommentPages(TestCase):
+    '''
+    Checks that comment pages work
+    '''
+    def test_streamer_page(self):
+        create_streamer_object()
+
+        template_base_path = os.path.join(settings.TEMPLATE_DIR, 'stream')
+        template_streamer_path = os.path.join(template_base_path, 'streamer.html')
+
+        template_str = get_template(template_streamer_path)
+        full_title_pattern = r'<title>(\s*|\n*)Stream Rater(\s*|\n*)-(\s*|\n*)teststreamer(\s*|\n*)</title>'
+
+        request = self.client.get(reverse('stream:show_streamer', kwargs={'name': 'teststreamer',
+                                                                          'category_name_slug': 'testcategory'}))
+        content = request.content.decode('utf-8')
+
+        self.assertTrue(re.search(full_title_pattern, content),
+                        f"{FAILURE_HEADER}The <title> of the response for 'stream:show_streamer' is not correct. Check your streamer.html template, and try again.{FAILURE_FOOTER}")
+
+        self.assertTrue('<h1 id="streamer-name">teststreamer</h1>' in content, f"{FAILURE_HEADER}We are missing the streamer name header in the streamer response.{FAILURE_FOOTER}")
+        self.assertTrue('Category: <a>testcategory</a>' in content, f"{FAILURE_HEADER}We are missing category name{FAILURE_FOOTER}")
+        self.assertTrue('Views this month: <a>0</a>' in content, f"{FAILURE_HEADER}We are missing monthly views{FAILURE_FOOTER}")
+        self.assertTrue('Rating: <a>No rating yet</a>' in content, f"{FAILURE_HEADER}We are missing rating{FAILURE_FOOTER}")
+
+    def test_streamer_page_logged_in(self):
+        create_streamer_object()
+
+        user_object = create_user_object()
+        self.client.login(username='testuser', password='testabc123')
+
+        request = self.client.get(reverse('stream:show_streamer', kwargs={'name': 'teststreamer',
+                                                                          'category_name_slug': 'testcategory'}))
+        content = request.content.decode('utf-8')
+
+        self.assertTrue('<a class="button" id="make-review" href="/stream/testcategory/teststreamer/comment/">Add A Review</a>' in content, f"{FAILURE_HEADER}We are missing make review button{FAILURE_FOOTER}")
+
+    def test_streamer_page_logged_out(self):
+        create_streamer_object()
+
+        request = self.client.get(reverse('stream:show_streamer', kwargs={'name': 'teststreamer',
+                                                                          'category_name_slug': 'testcategory'}))
+        content = request.content.decode('utf-8')
+        self.assertTrue('<p>You are not registered to make comments</p>' in content, f"{FAILURE_HEADER}We are missing make review denial message{FAILURE_FOOTER}")
+
+    def test_add_review(self):
+        create_streamer_object()
+        user_object = create_user_object()
+        self.client.login(username='testuser', password='testabc123')
+
+        request = self.client.get(reverse('stream:add_comment', kwargs={'name': 'teststreamer',
+                                                                          'category_name_slug': 'testcategory'}))
+        content = request.content.decode('utf-8')
+        self.assertTrue('<textarea name="text" cols="100" rows="20" class="form-bio" style="height: 5em;" id="id_text">' in content,
+                        f"{FAILURE_HEADER}We are missing text area input{FAILURE_FOOTER}")
+        self.assertTrue('<p>Give us your opinion:</p>' in content,
+                        f"{FAILURE_HEADER}We are missing text area input header{FAILURE_FOOTER}")
+        self.assertTrue('<input type="number" name="rating" value="0" required id="id_rating">' in content,
+                        f"{FAILURE_HEADER}We are missing make rating input{FAILURE_FOOTER}")
+        self.assertTrue('Rating between 1-5' in content,
+                        f"{FAILURE_HEADER}We are missing rating input header{FAILURE_FOOTER}")
+        self.assertTrue('<input class="button" id="post-comment" type="submit" name="submit" value="post comment" />' in content,
+                        f"{FAILURE_HEADER}We are missing submission button{FAILURE_FOOTER}")
+
+class DatabaseConfigurationTests(TestCase):
+    """
+    Is your database configured as the book states?
+    These tests should pass if you haven't tinkered with the database configuration.
+    N.B. Some of the configuration values we could check are overridden by the testing framework -- so we leave them.
+    """
+
+    def setUp(self):
+        pass
+
+    def does_gitignore_include_database(self, path):
+        """
+        Takes the path to a .gitignore file, and checks to see whether the db.sqlite3 database is present in that file.
+        """
+        f = open(path, 'r')
+
+        for line in f:
+            line = line.strip()
+
+            if line.startswith('db.sqlite3'):
+                return True
+
+        f.close()
+        return False
+
+    def test_databases_variable_exists(self):
+        """
+        Does the DATABASES settings variable exist, and does it have a default configuration?
+        """
+        self.assertTrue(settings.DATABASES,
+                        f"{FAILURE_HEADER}Your project's settings module does not have a DATABASES variable, which is required. Check the start of Chapter 5.{FAILURE_FOOTER}")
+        self.assertTrue('default' in settings.DATABASES,
+                        f"{FAILURE_HEADER}You do not have a 'default' database configuration in your project's DATABASES configuration variable. Check the start of Chapter 5.{FAILURE_FOOTER}")
+
+    def test_gitignore_for_database(self):
+        """
+        If you are using a Git repository and have set up a .gitignore, checks to see whether the database is present in that file.
+        """
+        git_base_dir = os.popen('git rev-parse --show-toplevel').read().strip()
+
+        if git_base_dir.startswith('fatal'):
+            warnings.warn(
+                "You don't appear to be using a Git repository for your codebase. Although not strictly required, it's *highly recommended*. Skipping this test.")
+        else:
+            gitignore_path = os.path.join(git_base_dir, '.gitignore')
+
+            if os.path.exists(gitignore_path):
+                self.assertTrue(self.does_gitignore_include_database(gitignore_path),
+                                f"{FAILURE_HEADER}Your .gitignore file does not include 'db.sqlite3' -- you should exclude the database binary file from all commits to your Git repository.{FAILURE_FOOTER}")
+            else:
+                warnings.warn(
+                    "You don't appear to have a .gitignore file in place in your repository. We ask that you consider this! Read the Don't git push your Database paragraph in Chapter 5.")
+
+class AdminInterfaceTests(TestCase):
+    """
+    A series of tests that examines the authentication functionality (for superuser creation and logging in), and admin interface changes.
+    Have all the admin interface tweaks been applied, and have the two models been added to the admin app?
+    """
+
+    def setUp(self):
+        """
+        Create a superuser account for use in testing.
+        Logs the superuser in, too!
+        """
+        User.objects.create_superuser('testAdmin', 'email@email.com', 'adminPassword123')
+        self.client.login(username='testAdmin', password='adminPassword123')
+
+        create_streamer_object()
+
+    def test_admin_interface_accessible(self):
+        response = self.client.get('/admin/')
+        self.assertEqual(response.status_code, 200,
+                         f"{FAILURE_HEADER}The admin interface is not accessible. Check that you didn't delete the 'admin/' URL pattern in your project's urls.py module.{FAILURE_FOOTER}")
+
+    def test_models_present(self):
+        """
+        Checks whether the two models are present within the admin interface homepage -- and whether Stream is listed there at all.
+        """
+        response = self.client.get('/admin/')
+        response_body = response.content.decode()
+
+        # Is the Stream app present in the admin interface's homepage?
+        self.assertTrue('Models in the Stream application' in response_body,
+                        f"{FAILURE_HEADER}The Stream app wasn't listed on the admin interface's homepage. You haven't added the models to the admin interface.{FAILURE_FOOTER}")
+
+        # Check each model is present.
+        self.assertTrue('Categories' in response_body,
+                        f"{FAILURE_HEADER}The Category model was not found in the admin interface. If you did add the model to admin.py, did you add the correct plural spelling (Categories)?{FAILURE_FOOTER}")
+        self.assertTrue('Streamers' in response_body,
+                        f"{FAILURE_HEADER}The Page model was not found in the admin interface. If you did add the model to admin.py, did you add the correct plural spelling (Streamers)?{FAILURE_FOOTER}")
+        self.assertTrue('Comments' in response_body,
+                        f"{FAILURE_HEADER}The Comment model was not found in the admin interface. If you did add the model to admin.py, did you add the correct plural spelling (Comments)?{FAILURE_FOOTER}")
+        self.assertTrue('Sub_Comments' in response_body,
+                        f"{FAILURE_HEADER}The Sub_Comment model was not found in the admin interface. If you did add the model to admin.py, did you add the correct plural spelling (Sub_Comments)?{FAILURE_FOOTER}")
+
+    def test_streamer_display_changes(self):
+        """
+        Checks to see whether the Page model has had the required changes applied for presentation in the admin interface.
+        """
+        response = self.client.get('/admin/stream/streamer/')
+        response_body = response.content.decode()
+
+        # Headers -- are they all present?
+        self.assertTrue('<div class="text"><a href="?o=1">Name</a></div>' in response_body,
+                        f"{FAILURE_HEADER}Name column not present in admin{FAILURE_FOOTER}")
+        self.assertTrue('<div class="text"><a href="?o=2">Category</a></div>' in response_body,
+                        f"{FAILURE_HEADER}Category column not present in admin{FAILURE_FOOTER}")
+        self.assertTrue('<div class="text"><a href="?o=3">Rating</a></div>' in response_body,
+                        f"{FAILURE_HEADER}Rating column not present in admin{FAILURE_FOOTER}")
+
+        # Is the TestPage1 page present, and in order?
+        expected_str = '<tr class="row1"><td class="action-checkbox"><input type="checkbox" name="_selected_action" value="1" class="action-select"></td><th class="field-name"><a href="/admin/stream/streamer/1/change/">teststreamer</a></th><td class="field-category nowrap">testcategory</td><td class="field-rating">0.0</td></tr>'
+        self.assertTrue(expected_str in response_body,
+                        f"{FAILURE_HEADER}Couldn't find generated streamer listed{FAILURE_FOOTER}")

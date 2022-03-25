@@ -5,7 +5,7 @@ from stream.models import Category, Streamer, UserProfile, Comment, SubComment
 
 
 class StreamerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'name',)
+    list_display = ('name', 'category', 'rating',)
 
 
 class CategoryAdmin(admin.ModelAdmin):
