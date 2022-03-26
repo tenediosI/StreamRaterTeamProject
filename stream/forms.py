@@ -4,6 +4,10 @@ from django.contrib.auth.models import User
 
 from stream.models import UserProfile, Comment, SubComment
 
+"""
+Form widgets have styling on them, those are the attribs
+"""
+
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Make it safe!!',
                                                         'class': 'form-password'}))

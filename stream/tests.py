@@ -573,23 +573,22 @@ class LinkTidyingTests(TestCase):
         self.assertTrue('href="/stream//testuser/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
         self.assertTrue('href="/stream//logout/"' not in content, f"{FAILURE_HEADER}Please check the links in your base.html have been updated correctly to change when users log in and out.{FAILURE_FOOTER}")
 
-
 class ProfilePages(TestCase):
     """
     Checks that profile pages work as desired
     """
-    def test_restricted_template_exists(self):
+    def test_profile_template_exists(self):
         """
         Checks whether the profile related html templates exists.
         """
         template_base_path = os.path.join(settings.TEMPLATE_DIR, 'stream')
         template_view_path = os.path.join(template_base_path, 'view_profile.html')
         template_edit_path = os.path.join(template_base_path, 'edit_profile.html')
-        self.assertTrue(os.path.exists(template_view_path), f"{FAILURE_HEADER}We couldn't find the 'restricted.html' template in the 'templates/stream/' directory. Did you put it in the right place? {FAILURE_FOOTER}")
-        self.assertTrue(os.path.exists(template_edit_path), f"{FAILURE_HEADER}We couldn't find the 'restricted.html' template in the 'templates/stream/' directory. Did you put it in the right place? {FAILURE_FOOTER}")
+        self.assertTrue(os.path.exists(template_view_path), f"{FAILURE_HEADER}We couldn't find the 'view_profile.html' template in the 'templates/stream/' directory. Did you put it in the right place? {FAILURE_FOOTER}")
+        self.assertTrue(os.path.exists(template_edit_path), f"{FAILURE_HEADER}We couldn't find the 'edit_profile.html' template in the 'templates/stream/' directory. Did you put it in the right place? {FAILURE_FOOTER}")
 
 
-    def test_restricted_template_inherits(self):
+    def test_profile_template_inherits(self):
         """
         Checks for template inheritance in profile related html's
         """
@@ -638,7 +637,6 @@ class CommentPages(TestCase):
         self.assertTrue('Rating: <a>3.0</a>' in content, f"{FAILURE_HEADER}We are missing rating{FAILURE_FOOTER}")
         self.assertTrue('<div class="comment-header"><a class="user-name" href="/stream//testuser/">testuser</a><a class="date">    March 25, 2022</a><br/>' in content, f"{FAILURE_HEADER}Missing test comment{FAILURE_FOOTER}")
 
-
     def test_streamer_page_logged_in(self):
         create_streamer_object()
 
@@ -680,7 +678,6 @@ class CommentPages(TestCase):
 
 class DatabaseConfigurationTests(TestCase):
     """
-    Is your database configured as the book states?
     These tests should pass if you haven't tinkered with the database configuration.
     N.B. Some of the configuration values we could check are overridden by the testing framework -- so we leave them.
     """

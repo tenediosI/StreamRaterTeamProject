@@ -13,8 +13,7 @@ def homepage(request):
     return response
 
 def about(request):
-    context_dict = {}
-    return render(request, 'stream/about.html', context=context_dict)
+    return render(request, 'stream/about.html')
 
 def show_category(request, category_name_slug):
     context_dict = {}

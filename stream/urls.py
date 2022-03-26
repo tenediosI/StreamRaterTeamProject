@@ -8,6 +8,12 @@ from django.urls import path
 
 app_name = 'stream'
 
+"""
+Some URL's have a slash before them because at some point they stopped being recognized.
+Even after looking into it with the help of tutors and demonstrators we couldn't figure it out.
+These problems persist on python anywhere but non of the webpages with slashes before them work.
+"""
+
 urlpatterns = [
 
     path('', views.homepage, name='homepage'),
