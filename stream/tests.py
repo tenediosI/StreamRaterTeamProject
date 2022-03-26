@@ -612,9 +612,9 @@ class ProfilePages(TestCase):
         self.assertTrue(re.search(block_title_pattern, template_str), f"{FAILURE_HEADER}Is edit_profile.html using template inheritance? Is your <title> block correct?{FAILURE_FOOTER}")
 
 class CommentPages(TestCase):
-    '''
+    """
     Checks that comment pages work
-    '''
+    """
     def test_streamer_page(self):
         create_comment_object()
 
