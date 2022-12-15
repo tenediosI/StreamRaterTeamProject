@@ -3,8 +3,8 @@
 
 1. Deadlines :(  :
     - 🟩 Design Spec 25/02 aka 25 Feb
-    - 🟥 App 25/03 aka 25 March
-    - 🟥 Presentation 25/03 March
+    - 🟩 App 25/03 aka 25 March
+    - 🟩 Presentation 25/03 March
 
 
 2. Checklist of stuff:
@@ -27,9 +27,9 @@
 
     - App (10/03-17/03):
         - 🟩 Get API Token, learn python use and maybe do something in populate (Iakovos)
-        - 🟥 Change populate and models to obtain streamer logo, total views and subs (Iakovos)
-        - 🟥 Make everything look 👌 (Reece, Jing, Iakovos)
-        - 🟥 Set up comment reply structure and fix minor issues (Ismail, Pedro)
+        - 🟩 Change populate and models to obtain streamer logo, total views and subs (Iakovos)
+        - 🟩 Make everything look 👌 (Reece, Jing, Iakovos)
+        - 🟩 Set up comment reply structure and fix minor issues (Ismail, Pedro)
 
     - Presentation:
         - ☠
